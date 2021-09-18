@@ -7,6 +7,7 @@ import { ListParams, Student } from 'models';
 import React, { useEffect } from 'react';
 import { useHistory, useRouteMatch } from 'react-router';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import StudentFilters from '../components/StudentFilters';
 import StudentTable from '../components/StudentTable';
 import {
@@ -82,6 +83,7 @@ export default function StudentListPage() {
         try {
             await studentApi.remove(student.id || '');
             dispatch(studentActions.setFilter({ ...studentFilter }));
+            toast.success('Remove student successfully!');
         } catch (error) {
             console.log('handleRemoveStudent error', error.message);
         }

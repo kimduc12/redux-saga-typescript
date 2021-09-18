@@ -3,7 +3,9 @@ import { ChevronLeft } from '@material-ui/icons';
 import studentApi from 'api/studentApi';
 import { Student } from 'models';
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import StudentForm from '../components/StudentForm';
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -19,8 +21,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AddEditPage() {
     const classes = useStyles();
+    const history = useHistory();
     const { studentId } = useParams<{ studentId: string }>();
-    const idEdit = Boolean(studentId);
+    const isEdit = Boolean(studentId);
     const [student, setStudent] = useState<Student>();
 
     useEffect(() => {
@@ -34,6 +37,28 @@ export default function AddEditPage() {
             }
         })();
     }, [studentId]);
+
+    const initialValue: Student = {
+        name: '',
+        age: 0,
+        mark: 0,
+        gender: 'male',
+        city: '',
+        ...student,
+    };
+
+    const handleFormSubmit = async (formValues: Student) => {
+        console.log('handleFormSubmit', formValues);
+        if (isEdit) {
+            await studentApi.update(studentId, formValues);
+        } else {
+            await studentApi.add(formValues);
+        }
+        toast.success('Save student successfully!');
+        history.push('/admin/students');
+        // throw new Error('Something wrong');
+    };
+
     return (
         <Box>
             <Link to="/admin/students" className={classes.back}>
@@ -42,7 +67,12 @@ export default function AddEditPage() {
                 </Typography>
             </Link>
 
-            <Typography variant="h4">{idEdit ? `Edit student` : `Add new student`}</Typography>
+            <Typography variant="h4">{isEdit ? `Edit student` : `Add new student`}</Typography>
+            {(!isEdit || Boolean(student)) && (
+                <Box mt={3}>
+                    <StudentForm initialValue={initialValue} onSubmit={handleFormSubmit} />
+                </Box>
+            )}
         </Box>
     );
 }
