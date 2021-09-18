@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import {
@@ -11,8 +11,15 @@ import {
     incrementSaga,
 } from './counterSlice';
 import styles from './Counter.module.css';
+import cityApi from 'api/cityApi';
 
 export function Counter() {
+    useEffect(() => {
+        (async () => {
+            const result = await cityApi.getAll();
+            console.log('city', result);
+        })();
+    }, []);
     const count = useAppSelector(selectCount);
     const dispatch = useAppDispatch();
     const [incrementAmount, setIncrementAmount] = useState('2');
